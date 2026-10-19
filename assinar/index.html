@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ahAK1cmMWROINSlNgkzj9tCOXPOHhATBk6wmhOf25Ec='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://grrewxwrldsxsouqrjqp.supabase.co; form-action 'none'; base-uri 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-U5BHGPOe1iOyNw+Lb41vaAUnjm6YwJHaxnCCdAEowDw='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://grrewxwrldsxsouqrjqp.supabase.co; form-action 'none'; base-uri 'none'" />
     <meta name="referrer" content="no-referrer" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -67,6 +67,7 @@
       .lead { margin: 0 0 28px; color: var(--muted); }
       .planos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 24px; }
       .plano { position: relative; cursor: pointer; }
+      .planos--um .plano { cursor: default; }
       .plano input { position: absolute; opacity: 0; }
       .plano .cartao {
         display: block; height: 100%; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface);
@@ -153,7 +154,7 @@
         <div class="campo">
           <label for="cupom">Cupom <span style="font-weight: 400; color: var(--muted)">(opcional)</span></label>
           <div class="cupom">
-            <input type="text" id="cupom" autocomplete="off" maxlength="40" placeholder="Ex.: CANDYFREE" />
+            <input type="text" id="cupom" autocomplete="off" maxlength="40" />
             <button type="button" id="aplicar" class="secundario">Aplicar</button>
           </div>
           <p id="cupom-msg" class="msg" role="status"></p>
@@ -174,11 +175,15 @@
       let cupomValido = null;
 
       const plano = () => document.querySelector('input[name="plano"]:checked').value;
-      if (["bp", "recruiter"].includes(params.get("plano"))) document.querySelector(`input[value="${params.get("plano")}"]`).checked = true;
-
-      // E-mail vindo da extensão (no #fragmento, que não vai para o servidor).
-      const fragmento = new URLSearchParams(location.hash.slice(1));
-      if (fragmento.get("email")) $("email").value = fragmento.get("email");
+      // Vindo de uma extensão (?plano=…): só o plano daquele produto, sem trocar.
+      const planoFixo = params.get("plano");
+      if (["bp", "recruiter"].includes(planoFixo)) {
+        const escolhido = document.querySelector(`input[value="${planoFixo}"]`);
+        escolhido.checked = true;
+        document.querySelectorAll('input[name="plano"]').forEach((r) => r !== escolhido && r.closest(".plano").remove());
+        document.querySelector(".planos").classList.add("planos--um");
+        document.querySelector("h1").textContent = `Plano ${planoFixo === "bp" ? "Business Partner" : "Recruiter"}`;
+      }
 
       const digitos = (v) => v.replace(/\D/g, "");
       $("cpf").addEventListener("input", (e) => {
@@ -189,6 +194,19 @@
         const d = digitos(e.target.value).slice(0, 11);
         e.target.value = d.length > 10 ? d.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3") : d.replace(/(\d{2})(\d{0,4})(\d{0,4})/, (m, a, b, c) => (b ? `(${a}) ${b}${c ? `-${c}` : ""}` : a));
       });
+      // Dados que a pessoa já informou na extensão (no #fragmento, que não vai
+      // para nenhum servidor). Preenche e apaga o fragmento da barra e do histórico.
+      const fragmento = new URLSearchParams(location.hash.slice(1));
+      for (const campo of ["nome", "email", "cpf", "telefone"]) {
+        const valor = fragmento.get(campo);
+        if (!valor) continue;
+        $(campo).value = valor.slice(0, 160);
+        $(campo).dispatchEvent(new Event("input"));
+      }
+      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+      // Corrigiu um campo: a mensagem de erro anterior some.
+      $("form").addEventListener("input", (e) => e.target.id !== "cupom" && ($("erro").textContent = ""));
+
       function cpfOk(v) {
         const d = digitos(v);
         if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
