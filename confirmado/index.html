@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-wiBOrLcv50KvmPcQCjpa1OvdqNm9+7Y50pPisXNmgN8='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://grrewxwrldsxsouqrjqp.supabase.co; form-action 'none'; base-uri 'none'" />
+    <meta name="referrer" content="no-referrer" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cadastro confirmado · Candydate</title>
+    <meta name="description" content="Confirmação do cadastro nas extensões Candydate." />
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600;700&display=swap" />
+    <style>
+      /* Mesmos tokens da página de assinatura (Candy Studio com o azul Candydate). */
+      :root {
+        --cta: #0e7ab8;
+        --ink: #383a47;
+        --muted: #6b6e76;
+        --bg: #f6f8fa;
+        --surface: #ffffff;
+        --border: #e2e6eb;
+        --primary-ink: #166f9f;
+        --soft: #eaf6fe;
+        --success: #15a66b;
+        --success-soft: #e7f7ef;
+        --danger: #d93a3f;
+        --danger-soft: #fdeced;
+        --mesh: radial-gradient(at 20% 0%, #dbeffd 0, transparent 50%), radial-gradient(at 80% 20%, #e6e8f6 0, transparent 50%);
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --ink: #f4f6f8;
+          --muted: #a1a6ae;
+          --bg: #0d1117;
+          --surface: #161b22;
+          --border: #262c36;
+          --primary-ink: #5cc0f5;
+          --soft: rgba(40, 170, 240, 0.14);
+          --success: #3ccf8e;
+          --success-soft: rgba(60, 207, 142, 0.14);
+          --danger: #ff7a7e;
+          --danger-soft: rgba(255, 122, 126, 0.14);
+          --mesh: radial-gradient(at 20% 0%, rgba(40, 170, 240, 0.16) 0, transparent 50%), radial-gradient(at 80% 20%, rgba(88, 96, 169, 0.16) 0, transparent 50%);
+          color-scheme: dark;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--mesh), var(--bg);
+        background-repeat: no-repeat;
+        background-size: 100% 560px, auto;
+        color: var(--ink);
+        font: 400 15px/24px Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      header { padding: 16px; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--surface) 85%, transparent); backdrop-filter: blur(12px); }
+      header .marca { max-width: 560px; margin: 0 auto; display: flex; align-items: center; }
+      header img { display: block; height: 30px; width: auto; }
+      main { max-width: 560px; margin: 0 auto; padding: 48px 16px 64px; }
+      .cartao { padding: 32px 28px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); box-shadow: 0 12px 32px rgba(56, 58, 71, 0.08); }
+      .selo { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 18px; border-radius: 50%; background: var(--success-soft); color: var(--success); }
+      .selo svg { width: 28px; height: 28px; }
+      .erro .selo { background: var(--danger-soft); color: var(--danger); }
+      .eyebrow { margin: 0 0 4px; color: var(--primary-ink); font: 600 12px/16px Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+      h1 { margin: 0 0 10px; font: 600 28px/34px Geist, Inter, sans-serif; letter-spacing: -0.02em; }
+      .lead { margin: 0 0 20px; color: var(--muted); }
+      ol { margin: 0; padding: 18px 20px 18px 40px; border-radius: 14px; background: var(--soft); }
+      li + li { margin-top: 8px; }
+      .nota { margin: 18px 0 0; color: var(--muted); font-size: 13px; }
+      .nota a { color: var(--primary-ink); }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <header><div class="marca"><img src="candydate-logo.png" alt="Candydate" /></div></header>
+    <main>
+      <section id="ok" class="cartao" aria-labelledby="titulo-ok">
+        <div class="selo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+        </div>
+        <p class="eyebrow">Cadastro</p>
+        <h1 id="titulo-ok">Cadastro confirmado</h1>
+        <p class="lead">Seu e-mail foi confirmado e a conta está pronta para uso.</p>
+        <ol>
+          <li>Volte ao Chrome e clique no ícone da extensão Candydate, na barra de ferramentas.</li>
+          <li>Entre com o e-mail e a senha que você criou.</li>
+          <li>No primeiro acesso, complete o cadastro para começar o teste gratuito de 3 dias e configure a sua empresa.</li>
+        </ol>
+        <p class="nota">Já pode fechar esta página.</p>
+      </section>
+
+      <section id="falha" class="cartao erro" aria-labelledby="titulo-falha" hidden>
+        <div class="selo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16.5v.5" /><circle cx="12" cy="12" r="9" /></svg>
+        </div>
+        <p class="eyebrow">Cadastro</p>
+        <h1 id="titulo-falha">Este link não vale mais</h1>
+        <p class="lead" id="motivo">O link de confirmação expirou ou já foi usado.</p>
+        <ol>
+          <li>Tente entrar na extensão com o seu e-mail e senha: se o cadastro já foi confirmado, o acesso funciona normalmente.</li>
+          <li>Se aparecer que o e-mail não foi confirmado, crie a conta de novo na extensão para receber um novo link.</li>
+        </ol>
+        <p class="nota">Precisa de ajuda? Fale com a Candydate.</p>
+      </section>
+    </main>
+    <script>
+      // O Supabase confirma o e-mail antes de redirecionar para cá. Erros
+      // (link expirado ou já usado) chegam em ?error=… ou #error=….
+      const consulta = new URLSearchParams(location.search);
+      const fragmento = new URLSearchParams(location.hash.slice(1));
+      const erro = consulta.get("error") || fragmento.get("error") || consulta.get("error_code") || fragmento.get("error_code");
+      if (erro) {
+        document.getElementById("ok").hidden = true;
+        document.getElementById("falha").hidden = false;
+        document.title = "Link de confirmação inválido · Candydate";
+      }
+      // O código do link não serve para nada aqui: sai da barra de endereço.
+      if (location.search || location.hash) history.replaceState(null, "", location.pathname);
+    </script>
+  </body>
+</html>
