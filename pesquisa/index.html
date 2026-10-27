@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-g2RgmXd86TvYBD0YL+1o6oP7AMkVmNBPL0moD+1avlc='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://grrewxwrldsxsouqrjqp.supabase.co; form-action 'none'; base-uri 'none'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KwhZZyJ9tPfw3GN8pGf7BKXo92/6KVFDdECSqP/300Y='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://grrewxwrldsxsouqrjqp.supabase.co; form-action 'none'; base-uri 'none'" />
     <meta name="referrer" content="no-referrer" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -110,12 +110,12 @@
       .opcoes span::before { content: ""; position: absolute; left: 12px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border: 2px solid var(--border-strong); border-radius: 50%; background: var(--surface); }
       .opcoes input[type="checkbox"] + span::before { border-radius: 4px; }
       .opcoes input:checked + span::before { border-color: var(--on-cta); background: var(--on-cta); box-shadow: inset 0 0 0 3px var(--cta); }
-      textarea, input[type="text"], input[type="email"] {
+      textarea, select, input[type="text"], input[type="email"] {
         width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 12px;
         background: var(--surface); color: var(--ink); font: inherit; clear: both; display: block;
       }
       textarea { min-height: 96px; resize: vertical; }
-      textarea:focus, input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--ring); }
+      textarea:focus, select:focus, input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--ring); }
       label.campo { display: block; font-weight: 600; margin: 0 0 6px; }
       .grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; clear: both; }
       .msg-erro { color: var(--danger); font-size: 13px; margin: 8px 0 0; clear: both; }
@@ -224,7 +224,10 @@
         const form = el("form", { novalidate: true });
         const nome = el("input", { type: "text", id: "nome", autocomplete: "name", maxlength: "160" });
         const email = el("input", { type: "email", id: "email", autocomplete: "email", maxlength: "254" });
-        const area = el("input", { type: "text", id: "area", maxlength: "80", placeholder: "Ex.: Comercial" });
+        // Área e time: da lista da empresa quando houver (sem nomes duplicados).
+        const lista = (id, nomes) => el("select", { id }, el("option", { value: "", text: "Prefiro não informar" }), ...nomes.map((n) => el("option", { value: n, text: n })));
+        const area = p.areas?.length ? lista("area", p.areas) : el("input", { type: "text", id: "area", maxlength: "80", placeholder: "Ex.: Comercial" });
+        const time = p.times?.length ? lista("time", p.times) : null;
         const erroGeral = el("p", { class: "msg-erro", role: "alert" });
         const enviar = el("button", { type: "submit", class: "enviar" }, "Enviar respostas");
 
@@ -235,7 +238,8 @@
           p.descricao ? el("p", { class: "lead", text: p.descricao }) : null,
           el("div", { class: "aviso", text: p.anonima ? "Pesquisa anônima: não pedimos nome nem e-mail, e os resultados são vistos de forma agregada." : offboarding ? "Suas respostas são confidenciais e lidas apenas pelo RH." : "Pesquisa identificada: seu nome e e-mail ajudam o RH a dar retorno a você." }),
           identificacao ? el("fieldset", {}, el("legend", { text: "Identificação" }), el("div", { class: "grade" }, el("div", {}, el("label", { class: "campo", for: "nome", text: "Nome" }), nome), el("div", {}, el("label", { class: "campo", for: "email", text: "E-mail corporativo" }), email))) : null,
-          !offboarding ? el("fieldset", {}, el("legend", {}, el("label", { for: "area", text: "Sua área" }), el("span", { class: "opc", text: " (opcional)" })), area) : null,
+          !offboarding ? el("fieldset", {}, el("legend", {}, el("label", { for: "area", text: "Sua área de atuação" }), el("span", { class: "opc", text: " (opcional)" })), area) : null,
+          !offboarding && time ? el("fieldset", {}, el("legend", {}, el("label", { for: "time", text: "Seu time" }), el("span", { class: "opc", text: " (opcional)" })), time) : null,
           ...perguntas.map(pergunta),
           erroGeral,
           enviar,
@@ -281,7 +285,7 @@
           enviar.disabled = true;
           enviar.textContent = "Enviando…";
           try {
-            await rpc("bp_responder_pesquisa", { p_token: token, p_respostas: respostas, p_nome: identificacao ? nome.value : null, p_email: identificacao ? email.value : null, p_area: offboarding ? null : area.value });
+            await rpc("bp_responder_pesquisa", { p_token: token, p_respostas: respostas, p_nome: identificacao ? nome.value : null, p_email: identificacao ? email.value : null, p_area: offboarding ? null : area.value, ...(time && !offboarding && time.value ? { p_time: time.value } : {}) });
             estado("Obrigado!", offboarding ? "Sua entrevista foi registrada. Desejamos sucesso no seu próximo passo." : "Suas respostas foram registradas. Elas ajudam a construir um lugar melhor para trabalhar.");
             window.scrollTo(0, 0);
           } catch (err) {
