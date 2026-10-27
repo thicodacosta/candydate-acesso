@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Entrevista · Candydate Interview</title>
+    <meta name="description" content="Entrevista conduzida pela entrevistadora de inteligência artificial do Candydate Interview." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600;700&display=swap" />
+    <link rel="stylesheet" href="sala.css" />
+  </head>
+  <body>
+    <a class="pular" href="#conteudo">Ir para o conteúdo</a>
+    <header class="topo">
+      <div class="topo__linha">
+        <span class="topo__marca"><img src="candydate-logo.png" alt="Candydate" /><span class="topo__produto">Interview</span></span>
+        <label class="nota"><input type="checkbox" id="texto-grande" /> Texto maior</label>
+      </div>
+    </header>
+
+    <main id="conteudo" tabindex="-1">
+      <!-- Carregando / erro -->
+      <section id="tela-carregando" aria-live="polite"><p class="lead">Carregando o convite…</p></section>
+      <section id="tela-erro" hidden><h1>Não foi possível abrir a entrevista</h1><p id="erro-texto" class="lead"></p></section>
+
+      <!-- 1. Boas-vindas, explicação e privacidade -->
+      <section id="tela-boas-vindas" hidden aria-labelledby="titulo-vaga">
+        <p class="eyebrow" id="empresa-nome"></p>
+        <h1 id="titulo-vaga"></h1>
+        <ul class="fatos" id="fatos"></ul>
+
+        <div class="card">
+          <h2>Como funciona</h2>
+          <p>Esta entrevista é conduzida por <strong id="nome-ia"></strong>, a <strong>entrevistadora de inteligência artificial</strong> do Candydate Interview. Ela faz uma pergunta por vez e pede exemplos reais da sua experiência: o contexto, o que você fez, por que decidiu assim e o que aconteceu.</p>
+          <ul class="lista">
+            <li>Duração estimada: <strong id="duracao"></strong>.</li>
+            <li>Você pode pedir para repetir ou reformular, pausar e retomar, ou encerrar quando quiser.</li>
+            <li>Não há resposta certa: se não tiver um exemplo, é só dizer. Números ajudam, mas não são obrigatórios.</li>
+            <li>A IA <strong>não decide</strong> nada sobre o processo: a equipe de recrutamento analisa o registro e toma as decisões.</li>
+            <li>Silêncio, pausas para pensar, sotaque ou problemas de conexão não contam contra você.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>Acessibilidade</h2>
+          <ul class="lista">
+            <li>Legendas da fala da entrevistadora ficam sempre visíveis, e você pode responder digitando a qualquer momento.</li>
+            <li>Se preferir, faça a entrevista inteira por texto. A modalidade usada é registrada para a equipe considerar na comparação.</li>
+            <li>Precisa de outra forma de participar (por exemplo, com uma pessoa)? Use "Pedir ajuda" e a equipe entra em contato.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>Privacidade</h2>
+          <p>A conversa é registrada em texto (transcrição) para a equipe de recrutamento de <span class="empresa"></span>. O áudio não é gravado. As respostas não são usadas para treinar modelos de outras empresas. Os dados ficam guardados pelo prazo definido pela empresa e você pode pedir a exclusão.</p>
+          <p id="aviso-empresa" class="nota"></p>
+          <label class="opcao"><input type="checkbox" id="consentimento" /> <span>Li as informações acima e quero participar da entrevista com a entrevistadora de IA.</span></label>
+          <p class="nota">Versão dos termos: <span id="termos-versao"></span></p>
+        </div>
+
+        <div class="card">
+          <h2>Como prefere responder?</h2>
+          <label class="opcao"><input type="radio" name="modalidade" value="voz" checked /> <span><strong>Por voz</strong>, como numa chamada. Recomendado em fone de ouvido.</span></label>
+          <label class="opcao"><input type="radio" name="modalidade" value="texto" /> <span><strong>Por texto</strong>, digitando as respostas.</span></label>
+        </div>
+        <div class="acoes">
+          <button class="btn btn--primario" id="ir-teste" disabled>Continuar</button>
+          <button class="btn" id="ir-agendar">Agendar para depois</button>
+        </div>
+      </section>
+
+      <!-- 2. Agendar -->
+      <section id="tela-agendar" hidden>
+        <h1>Agendar a entrevista</h1>
+        <p class="lead">Escolha um horário dentro da validade do convite. No horário, abra este mesmo link.</p>
+        <div class="campo"><label for="quando">Data e hora</label><input type="datetime-local" id="quando" /></div>
+        <p id="agendar-status" role="status"></p>
+        <div class="acoes"><button class="btn btn--primario" id="confirmar-agendar">Confirmar horário</button><button class="btn" data-voltar>Voltar</button></div>
+      </section>
+
+      <!-- 3. Teste técnico -->
+      <section id="tela-teste" hidden>
+        <h1>Teste rápido de áudio</h1>
+        <p class="lead">Leva menos de um minuto e evita surpresas durante a conversa.</p>
+        <div class="card">
+          <div class="teste-linha"><div><strong>Microfone</strong><div class="nota">Fale algo e veja a barra se mover.</div></div><span id="mic-status" class="nota">aguardando permissão</span></div>
+          <div class="medidor" aria-hidden="true"><span id="mic-nivel"></span></div>
+          <div class="teste-linha"><div><strong>Reconhecimento de fala</strong><div class="nota" id="stt-dica">Diga: "Estou pronta para começar" ou "Estou pronto para começar".</div></div><span id="stt-status" class="nota">—</span></div>
+          <p class="voce" id="stt-eco" aria-live="polite"></p>
+          <div class="teste-linha"><div><strong>Som</strong><div class="nota">Ouça a voz da entrevistadora.</div></div><button class="btn" id="testar-som">Tocar voz de teste</button></div>
+          <label class="opcao"><input type="checkbox" id="som-ok" /> <span>Consegui ouvir a voz de teste.</span></label>
+        </div>
+        <p id="teste-alerta" class="alerta" hidden></p>
+        <div class="acoes"><button class="btn btn--primario" id="comecar">Começar a entrevista</button><button class="btn" id="usar-texto">Fazer por texto</button><button class="btn" data-voltar>Voltar</button></div>
+      </section>
+
+      <!-- 4. Conversa -->
+      <section id="tela-conversa" hidden aria-label="Entrevista em andamento">
+        <div class="palco">
+          <div class="entrevistadora">
+            <div class="avatar" id="avatar" aria-hidden="true"></div>
+            <div><strong id="nome-ia-2"></strong> <span class="selo-ia">Entrevistadora de IA</span><div class="status" id="status" role="status" aria-live="polite"></div></div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Legenda</p>
+            <p class="legenda" id="legenda" aria-live="polite"></p>
+            <p class="voce" id="voce" aria-label="Sua fala reconhecida"></p>
+          </div>
+          <form id="form-texto" class="card">
+            <label for="resposta" class="eyebrow">Responder por texto</label>
+            <div class="campo"><textarea id="resposta" rows="4" placeholder="Escreva sua resposta…"></textarea></div>
+            <div class="acoes"><button class="btn btn--primario" type="submit">Enviar resposta</button></div>
+          </form>
+          <details class="card"><summary>Transcrição até aqui</summary><div class="historico" id="historico" aria-live="off"></div></details>
+        </div>
+        <div class="controles" role="toolbar" aria-label="Controles da entrevista">
+          <button class="btn" id="btn-mudo" aria-pressed="false">Silenciar microfone</button>
+          <button class="btn" id="btn-repetir">Repetir pergunta</button>
+          <button class="btn" id="btn-pausar">Pausar</button>
+          <button class="btn" id="btn-legenda" aria-pressed="true">Legendas: ligadas</button>
+          <button class="btn" id="btn-ajuda">Pedir ajuda</button>
+          <button class="btn btn--perigo" id="btn-encerrar">Encerrar</button>
+        </div>
+      </section>
+
+      <!-- 5. Pausada -->
+      <section id="tela-pausa" hidden>
+        <h1>Entrevista pausada</h1>
+        <p class="lead">Fique à vontade. As respostas já dadas estão salvas.</p>
+        <div class="acoes"><button class="btn btn--primario" id="btn-continuar">Retomar</button></div>
+      </section>
+
+      <!-- 6. Conclusão e pesquisa -->
+      <section id="tela-fim" hidden>
+        <p class="eyebrow">Entrevista concluída</p>
+        <h1>Obrigado pela conversa</h1>
+        <p class="lead">Suas respostas foram registradas. A equipe de recrutamento faz a análise e entra em contato pelo e-mail do convite. A decisão é sempre de uma pessoa da equipe.</p>
+        <form class="card" id="form-pesquisa">
+          <h2>Como foi a experiência?</h2>
+          <p class="nota">Opcional. Ajuda a melhorar a entrevista para outras pessoas.</p>
+          <fieldset style="border:0;padding:0;margin:0"><legend>Nota geral (1 a 5)</legend><div class="estrelas" id="nota"></div></fieldset>
+          <fieldset style="border:0;padding:0;margin:12px 0 0"><legend>As perguntas foram claras? (1 a 5)</legend><div class="estrelas" id="clareza"></div></fieldset>
+          <div class="campo"><label for="comentario">Comentário</label><textarea id="comentario" rows="3"></textarea></div>
+          <div class="acoes"><button class="btn btn--primario" type="submit">Enviar</button></div>
+          <p id="pesquisa-status" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <footer class="rodape">
+      Candydate Interview · <a href="#" id="link-exclusao">Pedir a exclusão dos meus dados</a> · <a href="#" id="link-ajuda">Pedir ajuda</a>
+    </footer>
+    <script type="module" src="sala.js"></script>
+  </body>
+</html>
