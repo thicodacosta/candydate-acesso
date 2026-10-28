@@ -136,8 +136,8 @@ label.opcao input { width: 20px; height: 20px; margin-top: 3px; accent-color: va
 [hidden] { display: none !important; }
 footer.rodape { max-width: 760px; margin: 0 auto; padding: 0 16px 32px; font-size: 13px; color: var(--muted); }
 footer.rodape a { color: var(--primary-ink); }
-@media (max-width: 600px) {
-  /* No celular a barra fixa cobriria a resposta: fica no fluxo, logo abaixo da conversa. */
+@media (max-width: 600px), (max-height: 700px) {
+  /* Em telas estreitas ou baixas a barra fixa cobriria a resposta e o botão de envio: fica no fluxo, abaixo da conversa. */
   .controles { position: static; background: none; }
   .controles .btn { flex: 1 1 45%; }
 }
