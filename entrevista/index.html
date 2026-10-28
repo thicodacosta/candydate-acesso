@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600;700&display=swap" />
-    <link rel="stylesheet" href="sala.css?v=mvs7y5l1" />
+    <link rel="stylesheet" href="sala.css?v=mvsa99hu" />
   </head>
   <body>
     <a class="pular" href="#conteudo">Ir para o conteúdo</a>
@@ -91,6 +91,10 @@
           <div class="teste-linha"><div><strong>Reconhecimento de fala</strong><div class="nota" id="stt-dica">Diga: "Estou pronta para começar" ou "Estou pronto para começar".</div></div><span id="stt-status" class="nota">—</span></div>
           <p class="voce" id="stt-eco" aria-live="polite"></p>
           <div class="teste-linha"><div><strong>Som</strong><div class="nota">Ouça a voz da entrevistadora.</div></div><button class="btn" id="testar-som">Tocar voz de teste</button></div>
+          <div class="ajustes">
+            <label class="campo"><span>Volume</span><input type="range" id="volume-teste" min="0" max="100" step="5" /></label>
+            <label class="campo"><span>Velocidade da voz</span><select id="velocidade-teste"><option value="0.9">Mais devagar</option><option value="1">Normal</option><option value="1.1">Mais rápida</option></select></label>
+          </div>
           <label class="opcao"><input type="checkbox" id="som-ok" /> <span>Consegui ouvir a voz de teste.</span></label>
         </div>
         <p id="teste-alerta" class="alerta" hidden></p>
@@ -114,6 +118,12 @@
             <div class="campo"><textarea id="resposta" rows="4" placeholder="Escreva sua resposta…"></textarea></div>
             <div class="acoes"><button class="btn btn--primario" type="submit">Enviar resposta</button></div>
           </form>
+          <details class="card"><summary>Ajustes de áudio</summary>
+            <div class="ajustes">
+              <label class="campo"><span>Volume</span><input type="range" id="volume" min="0" max="100" step="5" /></label>
+              <label class="campo"><span>Velocidade da voz</span><select id="velocidade"><option value="0.9">Mais devagar</option><option value="1">Normal</option><option value="1.1">Mais rápida</option></select></label>
+            </div>
+          </details>
           <details class="card"><summary>Transcrição até aqui</summary><div class="historico" id="historico" aria-live="off"></div></details>
         </div>
         <div class="controles" role="toolbar" aria-label="Controles da entrevista">
@@ -152,6 +162,6 @@
     <footer class="rodape">
       Candydate Interview · <a href="#" id="link-exclusao">Pedir a exclusão dos meus dados</a> · <a href="#" id="link-ajuda">Pedir ajuda</a>
     </footer>
-    <script type="module" src="sala.js?v=mvs7y5l1"></script>
+    <script type="module" src="sala.js?v=mvsa99hu"></script>
   </body>
 </html>

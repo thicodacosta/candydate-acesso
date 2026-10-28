@@ -141,3 +141,5 @@ footer.rodape a { color: var(--primary-ink); }
   .controles { position: static; background: none; }
   .controles .btn { flex: 1 1 45%; }
 }
+.ajustes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 8px; }
+.ajustes input[type="range"] { accent-color: var(--cta); min-height: 32px; padding: 0; border: 0; }
