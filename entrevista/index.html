@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600;700&display=swap" />
-    <link rel="stylesheet" href="sala.css?v=mvsgrrgh" />
+    <link rel="stylesheet" href="sala.css?v=mvv06m3f" />
   </head>
   <body>
     <a class="pular" href="#conteudo">Ir para o conteúdo</a>
@@ -55,7 +55,7 @@
 
         <div class="card">
           <h2>Privacidade</h2>
-          <p>A conversa é registrada em texto (transcrição) para a equipe de recrutamento de <span class="empresa"></span>. O áudio não é gravado. As respostas não são usadas para treinar modelos de outras empresas. Os dados ficam guardados pelo prazo definido pela empresa e você pode pedir a exclusão.</p>
+          <p>A conversa é registrada em texto (transcrição) para a equipe de recrutamento de <span class="empresa"></span>. O áudio não é gravado. Se você ligar a câmera, a imagem aparece só na sua tela: não é gravada nem enviada. As respostas não são usadas para treinar modelos de outras empresas. Os dados ficam guardados pelo prazo definido pela empresa e você pode pedir a exclusão.</p>
           <p id="aviso-empresa" class="nota"></p>
           <label class="opcao"><input type="checkbox" id="consentimento" /> <span>Li as informações acima e quero participar da entrevista com a entrevistadora de IA.</span></label>
           <p class="nota">Versão dos termos: <span id="termos-versao"></span></p>
@@ -97,51 +97,132 @@
           </div>
           <label class="opcao"><input type="checkbox" id="som-ok" /> <span>Consegui ouvir a voz de teste.</span></label>
         </div>
+        <div class="card camera-teste">
+          <div class="camera-teste__previa" data-camera="desligada" id="previa-camera">
+            <video id="camera-previa" playsinline muted autoplay aria-label="Prévia da sua câmera"></video>
+            <span class="camera-teste__vazio" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 10l5-3v10l-5-3zM3 6h12v12H3z"/></svg></span>
+          </div>
+          <div>
+            <strong>Câmera (opcional)</strong>
+            <p class="nota">Para você se ver durante a conversa, como numa chamada de vídeo. A imagem aparece só na sua tela: não é gravada nem enviada.</p>
+            <p class="nota" id="camera-teste-status" role="status"></p>
+            <button class="btn" id="testar-camera" type="button">Ligar câmera</button>
+          </div>
+        </div>
         <p id="teste-alerta" class="alerta" hidden></p>
         <div class="acoes"><button class="btn btn--primario" id="comecar">Começar a entrevista</button><button class="btn" id="usar-texto">Fazer por texto</button><button class="btn" data-voltar>Voltar</button></div>
       </section>
 
-      <!-- 4. Conversa -->
-      <section id="tela-conversa" hidden aria-label="Entrevista em andamento">
+      <!-- 4. Conversa: entrevistadora (onda) | você (câmera), falas e controles -->
+      <section id="tela-conversa" class="sala" data-fase="conectando" hidden aria-label="Entrevista em andamento">
+        <div class="sala__barra">
+          <p class="fase" aria-live="polite"><span class="fase__ponto" aria-hidden="true"></span><strong id="fase-rotulo">Conectando</strong><span class="fase__texto" id="status" role="status"></span></p>
+          <p class="sala__info">
+            <span class="conexao" id="conexao" data-conexao="estavel"><span class="conexao__ponto" aria-hidden="true"></span><span id="conexao-texto">Conexão estável</span></span>
+            <span class="tempo" aria-label="Tempo de entrevista"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span id="tempo">00:00</span></span>
+          </p>
+        </div>
+
         <div class="palco">
-          <div class="entrevistadora">
-            <div class="avatar" id="avatar" aria-hidden="true"></div>
-            <div><strong id="nome-ia-2"></strong> <span class="selo-ia">Entrevistadora de IA</span><div class="status" id="status" role="status" aria-live="polite"></div></div>
-          </div>
-          <div class="card">
-            <p class="eyebrow">Legenda</p>
-            <p class="legenda" id="legenda" aria-live="polite"></p>
-            <p class="voce" id="voce" aria-label="Sua fala reconhecida"></p>
-          </div>
-          <form id="form-texto" class="card">
-            <label for="resposta" class="eyebrow">Responder por texto</label>
-            <div class="campo"><textarea id="resposta" rows="4" placeholder="Escreva sua resposta…"></textarea></div>
-            <div class="acoes"><button class="btn btn--primario" type="submit">Enviar resposta</button></div>
-          </form>
-          <details class="card"><summary>Ajustes de áudio</summary>
-            <div class="ajustes">
-              <label class="campo"><span>Volume</span><input type="range" id="volume" min="0" max="100" step="5" /></label>
-              <label class="campo"><span>Velocidade da voz</span><select id="velocidade"><option value="0.9">Mais devagar</option><option value="1">Normal</option><option value="1.1">Mais rápida</option></select></label>
+          <figure class="painel painel--ia" id="painel-ia">
+            <canvas id="onda" aria-hidden="true"></canvas>
+            <figcaption class="etiqueta"><span class="etiqueta__fala" aria-hidden="true"></span><strong id="nome-ia-2"></strong><span class="selo-ia">IA</span></figcaption>
+          </figure>
+          <figure class="painel painel--voce" id="painel-voce" data-camera="desligada">
+            <video id="camera" playsinline muted autoplay aria-label="Sua imagem (só você vê)"></video>
+            <div class="sem-camera" aria-hidden="true"><span class="sem-camera__inicial" id="inicial-candidato"></span></div>
+            <p class="camera-aviso" id="camera-aviso" role="status"></p>
+            <figcaption class="etiqueta"><span class="etiqueta__mic" aria-hidden="true"><i></i><i></i><i></i></span><strong id="nome-candidato">Você</strong><span class="etiqueta__mudo" id="etiqueta-mudo" hidden>microfone desligado</span></figcaption>
+          </figure>
+
+          <!-- 5. Pausada (sobre o palco) -->
+          <section id="tela-pausa" class="pausa" hidden aria-labelledby="titulo-pausa">
+            <div class="pausa__caixa">
+              <h1 id="titulo-pausa">Entrevista pausada</h1>
+              <p class="lead">Fique à vontade. As respostas já dadas estão salvas.</p>
+              <div class="acoes"><button class="btn btn--primario" id="btn-continuar">Retomar a entrevista</button></div>
             </div>
-          </details>
-          <details class="card"><summary>Transcrição até aqui</summary><div class="historico" id="historico" aria-live="off"></div></details>
+          </section>
         </div>
+
+        <div class="falas">
+          <div class="fala fala--ia">
+            <p class="fala__quem"><span id="nome-ia-3"></span> · Entrevistadora</p>
+            <p class="legenda" id="legenda" aria-live="polite"></p>
+            <p class="pensando" aria-hidden="true"><i></i><i></i><i></i></p>
+          </div>
+          <div class="fala fala--voce">
+            <p class="fala__quem">Você</p>
+            <p class="voce" id="voce" aria-label="Sua fala reconhecida"></p>
+            <p class="fala__vazia">Sua resposta aparece aqui enquanto você fala.</p>
+          </div>
+        </div>
+        <p class="reenviar" id="reenviar" hidden><span>Não conseguimos enviar sua última resposta.</span> <button class="btn btn--primario" id="btn-tentar" type="button">Tentar de novo</button></p>
+
         <div class="controles" role="toolbar" aria-label="Controles da entrevista">
-          <button class="btn" id="btn-mudo" aria-pressed="false">Silenciar microfone</button>
-          <button class="btn" id="btn-repetir">Repetir pergunta</button>
-          <button class="btn" id="btn-pausar">Pausar</button>
-          <button class="btn" id="btn-legenda" aria-pressed="true">Legendas: ligadas</button>
-          <button class="btn" id="btn-ajuda">Pedir ajuda</button>
-          <button class="btn btn--perigo" id="btn-encerrar">Encerrar</button>
+          <div class="controles__grupo">
+            <button class="ctl" id="btn-mudo" type="button" aria-pressed="false" aria-label="Desligar microfone" title="Desligar microfone">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-on" d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/><path class="i-off" d="M2 2l20 20M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.9-.6M17 16.9A7 7 0 0 1 5 12v-2M19 10v2c0 .8-.1 1.5-.4 2.2M12 19v3"/></svg>
+              <span class="ctl__rotulo">Microfone</span>
+            </button>
+            <button class="ctl" id="btn-camera" type="button" aria-pressed="false" aria-label="Ligar câmera" title="Ligar câmera">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-on" d="M15 10l5-3v10l-5-3zM3 6h12v12H3z"/><path class="i-off" d="M2 2l20 20M15 10l5-3v10l-5-3M10.7 6H15v4.3M15 15v3H3V6h2"/></svg>
+              <span class="ctl__rotulo">Câmera</span>
+            </button>
+          </div>
+          <div class="controles__grupo">
+            <button class="ctl" id="btn-repetir" type="button" aria-label="Repetir a pergunta" title="Repetir a pergunta">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+              <span class="ctl__rotulo">Repetir</span>
+            </button>
+            <button class="ctl" id="btn-legenda" type="button" aria-pressed="true" aria-label="Legendas ligadas" title="Legendas">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3zM7 13h3M14 13h3M7 16h6"/></svg>
+              <span class="ctl__rotulo">Legendas</span>
+            </button>
+            <details class="ajustes-pop">
+              <summary class="ctl" aria-label="Volume e velocidade da voz" title="Volume e velocidade da voz">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
+                <span class="ctl__rotulo">Áudio</span>
+              </summary>
+              <div class="ajustes-pop__caixa">
+                <label class="campo"><span>Volume</span><input type="range" id="volume" min="0" max="100" step="5" /></label>
+                <label class="campo"><span>Velocidade da voz</span><select id="velocidade"><option value="0.9">Mais devagar</option><option value="1">Normal</option><option value="1.1">Mais rápida</option></select></label>
+              </div>
+            </details>
+            <button class="ctl" id="btn-pausar" type="button" aria-label="Pausar a entrevista" title="Pausar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+              <span class="ctl__rotulo">Pausar</span>
+            </button>
+            <button class="ctl" id="btn-ajuda" type="button" aria-label="Pedir ajuda à equipe" title="Pedir ajuda">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>
+              <span class="ctl__rotulo">Ajuda</span>
+            </button>
+          </div>
+          <button class="ctl ctl--encerrar" id="btn-encerrar" type="button" aria-label="Encerrar a entrevista" title="Encerrar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 14.5c4.6-4 10.4-4 15 0l-1.8 2.3-3.3-1.4V12.8a12 12 0 0 0-4.8 0v2.6l-3.3 1.4z"/></svg>
+            <span class="ctl__rotulo">Encerrar</span>
+          </button>
         </div>
+
+        <details class="digitar" id="digitar">
+          <summary>Responder digitando</summary>
+          <form id="form-texto">
+            <label for="resposta" class="visually-hidden">Sua resposta</label>
+            <textarea id="resposta" rows="3" placeholder="Escreva sua resposta…"></textarea>
+            <button class="btn btn--primario" type="submit">Enviar resposta</button>
+          </form>
+        </details>
+        <details class="historico-caixa"><summary>Ver a conversa completa</summary><div class="historico" id="historico" aria-live="off"></div></details>
+
       </section>
 
-      <!-- 5. Pausada -->
-      <section id="tela-pausa" hidden>
-        <h1>Entrevista pausada</h1>
-        <p class="lead">Fique à vontade. As respostas já dadas estão salvas.</p>
-        <div class="acoes"><button class="btn btn--primario" id="btn-continuar">Retomar</button></div>
-      </section>
+      <dialog id="dlg-encerrar" class="dialogo" aria-labelledby="dlg-encerrar-titulo">
+        <form method="dialog">
+          <h2 id="dlg-encerrar-titulo">Encerrar a entrevista agora?</h2>
+          <p>O que você respondeu até aqui fica registrado. Depois de encerrar, não é possível continuar por este link.</p>
+          <div class="acoes"><button class="btn" value="nao" autofocus>Continuar a entrevista</button><button class="btn btn--perigo-cheio" value="sim">Encerrar</button></div>
+        </form>
+      </dialog>
 
       <!-- 6. Conclusão e pesquisa -->
       <section id="tela-fim" hidden>
@@ -162,6 +243,6 @@
     <footer class="rodape">
       Candydate Interview · <a href="#" id="link-exclusao">Pedir a exclusão dos meus dados</a> · <a href="#" id="link-ajuda">Pedir ajuda</a>
     </footer>
-    <script type="module" src="sala.js?v=mvsgrrgh"></script>
+    <script type="module" src="sala.js?v=mvv06m3f"></script>
   </body>
 </html>

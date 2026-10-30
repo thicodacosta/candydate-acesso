@@ -74,6 +74,8 @@ header.topo {
 .topo__marca { display: flex; align-items: center; gap: 10px; font: 600 15px/20px Geist, Inter, sans-serif; letter-spacing: -0.02em; }
 .topo__marca img { height: 26px; width: auto; }
 .topo__produto { color: var(--muted); font-weight: 500; }
+/* O foco programático ao trocar de tela não desenha contorno (o conteúdo continua acessível). */
+#conteudo:focus { outline: none; }
 main { max-width: 760px; margin: 0 auto; padding: 24px 16px 96px; }
 h1 { font: 650 clamp(24px, 4vw, 32px)/1.15 Geist, Inter, sans-serif; letter-spacing: -0.02em; margin: 8px 0 12px; }
 h2 { font: 600 19px/1.3 Geist, Inter, sans-serif; letter-spacing: -0.01em; margin: 0 0 8px; }
@@ -111,20 +113,181 @@ label.opcao input { width: 20px; height: 20px; margin-top: 3px; accent-color: va
 .teste-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .teste-linha:last-child { border-bottom: 0; }
 
-/* Conversa */
-.palco { display: grid; gap: 16px; }
-.entrevistadora { display: flex; align-items: center; gap: 14px; }
-.avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--brand, linear-gradient(135deg, #28aaf0 0%, #5860a9 100%)); display: grid; place-items: center; color: #fff; font: 700 18px Geist, sans-serif; flex: none; position: relative; }
-.avatar.falando::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--primary); animation: pulso 1.2s var(--ease) infinite; }
-@media (prefers-reduced-motion: reduce) { .avatar.falando::after { animation: none; } }
-@keyframes pulso { from { opacity: 0.9; transform: scale(0.95); } to { opacity: 0; transform: scale(1.18); } }
-.selo-ia { display: inline-block; font: 600 11px/16px Inter; letter-spacing: 0.06em; text-transform: uppercase; color: var(--primary-ink); background: var(--soft); border-radius: 999px; padding: 2px 8px; }
-.status { font-size: 14px; color: var(--muted); min-height: 22px; }
-.legenda { font-size: 1.15em; line-height: 1.5; min-height: 3em; }
-.voce { border-left: 3px solid var(--primary); padding-left: 12px; color: var(--muted); min-height: 1.6em; }
-.controles { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; background: linear-gradient(to top, var(--bg) 70%, transparent); }
-.controles .btn { flex: 1 1 140px; }
-.historico { display: grid; gap: 10px; max-height: 50vh; overflow: auto; padding-right: 4px; }
+/* ─── Conversa ────────────────────────────────────────────────────────────
+   Palco escuro (tokens do tema escuro Candydate) com a entrevistadora (onda)
+   e você (câmera) lado a lado; falas de cada um logo abaixo; controles numa
+   barra estável no rodapé. */
+body.em-conversa main { max-width: 1240px; padding-top: 16px; padding-bottom: 48px; }
+body.em-conversa .topo__linha, body.em-conversa footer.rodape { max-width: 1240px; }
+.sala { --palco: #0d1117; --palco-2: #161b22; --palco-borda: #262c36; --palco-texto: #f4f6f8; --palco-suave: #a1a6ae; display: grid; gap: 16px; }
+
+.sala__barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.fase { display: inline-flex; align-items: center; gap: 10px; margin: 0; min-height: 36px; padding: 6px 14px 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: 14px; line-height: 20px; max-width: 100%; }
+.fase strong { font-weight: 600; white-space: nowrap; }
+.fase__texto { color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+.fase__texto:not(:empty)::before { content: "·"; margin-right: 8px; color: var(--border-strong); }
+.fase__ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+[data-fase="falando"] .fase__ponto, [data-fase="ouvindo"] .fase__ponto { background: var(--primary); box-shadow: 0 0 0 4px var(--ring); }
+[data-fase="pensando"] .fase__ponto, [data-fase="conectando"] .fase__ponto { background: var(--primary); animation: piscar 1.2s ease-in-out infinite; }
+[data-fase="erro"] .fase__ponto { background: var(--danger); }
+[data-fase="pausada"] .fase__ponto { background: #f5a623; }
+.sala__info { display: flex; align-items: center; gap: 16px; margin: 0; font-size: 13px; color: var(--muted); }
+.conexao, .tempo { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.conexao__ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+[data-conexao="instavel"] .conexao__ponto { background: #f5a623; }
+[data-conexao="offline"] .conexao__ponto { background: var(--danger); }
+.tempo svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.tempo span { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; }
+
+/* Palco: dois painéis equilibrados. */
+.palco { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.painel { position: relative; margin: 0; aspect-ratio: 4 / 3; max-height: min(50vh, 500px); width: 100%; border-radius: 20px; overflow: hidden; background: radial-gradient(120% 90% at 50% 100%, #10243a 0%, var(--palco) 60%); border: 1px solid var(--palco-borda); box-shadow: 0 1px 2px rgba(13, 17, 23, 0.08), 0 12px 32px rgba(13, 17, 23, 0.12); transition: box-shadow 240ms var(--ease), border-color 240ms var(--ease); }
+.painel.ativo { border-color: rgba(40, 170, 240, 0.65); box-shadow: 0 0 0 3px rgba(40, 170, 240, 0.25), 0 12px 32px rgba(13, 17, 23, 0.16); }
+.painel--voce { background: linear-gradient(160deg, var(--palco-2), var(--palco)); }
+#onda { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: opacity 900ms var(--ease); }
+[data-fase="encerrada"] #onda { opacity: 0.25; }
+[data-fase="pausada"] #onda { opacity: 0.55; }
+
+/* Etiquetas sobre o vídeo, como numa chamada. */
+.etiqueta { position: absolute; left: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 8px; max-width: calc(100% - 24px); padding: 6px 12px; border-radius: 999px; background: rgba(13, 17, 23, 0.62); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--palco-texto); font-size: 14px; line-height: 20px; }
+.etiqueta strong { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.selo-ia { display: inline-block; font: 600 10.5px/16px Inter, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #0d1117; background: var(--primary); border-radius: 999px; padding: 1px 7px; }
+.etiqueta__fala { width: 8px; height: 8px; border-radius: 50%; background: var(--palco-suave); flex: none; transition: background 200ms; }
+.painel.ativo .etiqueta__fala { background: var(--primary); box-shadow: 0 0 0 4px rgba(40, 170, 240, 0.3); }
+/* Nível real do microfone em três barras (--nivel vem do analisador). */
+.etiqueta__mic { display: inline-flex; align-items: center; gap: 2px; height: 14px; }
+.etiqueta__mic i { width: 3px; border-radius: 2px; background: var(--primary); height: calc(4px + var(--nivel, 0) * 10px); transition: height 80ms linear; }
+.etiqueta__mic i:nth-child(2) { height: calc(4px + var(--nivel, 0) * 14px); }
+[data-mic="nao"] .etiqueta__mic, [data-mudo="true"] .etiqueta__mic { display: none; }
+.etiqueta__mudo { font-size: 12px; color: #ffb4b6; white-space: nowrap; }
+
+/* Vídeo do candidato (espelhado, como num espelho) e estado sem câmera. */
+#camera { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); opacity: 0; transition: opacity 300ms var(--ease); }
+[data-camera="ligada"] #camera { opacity: 1; }
+.sem-camera { position: absolute; inset: 0; display: grid; place-items: center; transition: opacity 300ms; }
+[data-camera="ligada"] .sem-camera { opacity: 0; }
+.sem-camera__inicial { width: clamp(72px, 22%, 112px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, #28aaf0 0%, #5860a9 100%); color: #fff; font: 600 clamp(28px, 3vw, 40px) Geist, Inter, sans-serif; box-shadow: 0 0 0 calc(var(--nivel, 0) * 14px) rgba(40, 170, 240, 0.22); transition: box-shadow 90ms linear; }
+.camera-aviso { position: absolute; left: 12px; right: 12px; top: 12px; margin: 0; padding: 8px 12px; border-radius: var(--radius-md); background: rgba(13, 17, 23, 0.72); color: var(--palco-texto); font-size: 13px; line-height: 18px; }
+.camera-aviso:empty { display: none; }
+
+/* Pausa sobre o palco. */
+.pausa { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: 16px; border-radius: 20px; background: rgba(13, 17, 23, 0.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: surgir 240ms var(--ease); }
+.pausa__caixa { max-width: 420px; padding: 24px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); text-align: center; box-shadow: 0 12px 32px rgba(13, 17, 23, 0.25); }
+.pausa__caixa h1 { font-size: 24px; margin-top: 0; }
+.pausa__caixa .acoes { justify-content: center; }
+
+/* Falas: a mais recente de cada participante, sob o painel correspondente. */
+.falas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.fala { position: relative; min-height: 96px; padding: 14px 18px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
+.fala__quem { margin: 0 0 4px; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.fala--ia .fala__quem { color: var(--primary-ink); }
+.legenda { margin: 0; font-size: 1.08em; line-height: 1.55; max-height: 7.8em; overflow-y: auto; overscroll-behavior: contain; }
+.voce { margin: 0; color: var(--ink); line-height: 1.55; max-height: 7.8em; overflow-y: auto; overscroll-behavior: contain; }
+.fala__vazia { margin: 0; color: var(--muted); font-size: 14px; }
+.voce:not(:empty) + .fala__vazia { display: none; }
+[data-fase="falando"] .fala--ia, [data-fase="pensando"] .fala--ia { border-color: rgba(40, 170, 240, 0.45); }
+[data-fase="ouvindo"] .fala--voce { border-color: rgba(40, 170, 240, 0.45); }
+/* "Pensando": três pontos discretos enquanto a resposta é processada. */
+.pensando { display: none; gap: 4px; margin: 6px 0 0; }
+[data-fase="pensando"] .pensando { display: inline-flex; }
+.pensando i { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); animation: piscar 1.2s ease-in-out infinite; }
+.pensando i:nth-child(2) { animation-delay: 0.15s; }
+.pensando i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes piscar { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+@keyframes surgir { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.legenda, .voce { animation: surgir 200ms var(--ease); }
+
+.reenviar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 0; padding: 12px 14px; border-radius: var(--radius-md); background: var(--warning-bg); color: var(--warning-ink); }
+
+/* Responder digitando e conversa completa. */
+.digitar, .historico-caixa { border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
+.digitar summary, .historico-caixa summary { cursor: pointer; padding: 12px 18px; font-weight: 600; font-size: 15px; border-radius: var(--radius); }
+.digitar summary:focus-visible, .historico-caixa summary:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--ring); }
+#form-texto { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 0 18px 16px; }
+#form-texto textarea { flex: 1 1 320px; font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 10px 12px; min-height: 52px; resize: vertical; }
+.historico { display: grid; gap: 10px; max-height: 50vh; overflow: auto; padding: 0 18px 16px; }
+
+/* Barra de controles. */
+.controles { justify-self: center; display: flex; align-items: center; gap: 6px; max-width: 100%; padding: 8px; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 12px 32px rgba(13, 17, 23, 0.16), 0 2px 6px rgba(13, 17, 23, 0.06); }
+.controles__grupo { display: flex; gap: 4px; }
+.controles__grupo + .controles__grupo { padding-left: 6px; margin-left: 2px; border-left: 1px solid var(--border); }
+.ctl { position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 56px; padding: 6px 8px; border: 0; border-radius: 14px; background: none; color: var(--ink); font: 500 12px/14px Inter, sans-serif; cursor: pointer; list-style: none; transition: background 160ms var(--ease), color 160ms var(--ease); }
+.ctl::-webkit-details-marker { display: none; }
+.ctl svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ctl:hover { background: var(--soft); }
+.ctl:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--ring); }
+.ctl[disabled] { opacity: 0.5; cursor: not-allowed; }
+.ctl .i-off { display: none; }
+#btn-mudo[aria-pressed="true"], #btn-camera[aria-pressed="false"] { color: var(--danger); }
+#btn-mudo[aria-pressed="true"] .i-on, #btn-camera[aria-pressed="false"] .i-on { display: none; }
+#btn-mudo[aria-pressed="true"] .i-off, #btn-camera[aria-pressed="false"] .i-off { display: inline; }
+#btn-camera[aria-pressed="false"] { color: var(--muted); }
+#btn-legenda[aria-pressed="false"] { color: var(--muted); }
+.ctl--encerrar { margin-left: 6px; background: var(--danger); color: #fff; }
+.ctl--encerrar:hover { background: #a82226; color: #fff; }
+.ajustes-pop { position: relative; }
+.ajustes-pop__caixa { position: absolute; bottom: calc(100% + 14px); left: 50%; transform: translateX(-50%); width: 260px; padding: 12px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); box-shadow: 0 12px 32px rgba(13, 17, 23, 0.18); }
+.ajustes-pop__caixa .campo { margin: 6px 0; }
+.ajustes-pop__caixa input[type="range"] { accent-color: var(--cta); padding: 0; border: 0; min-height: 28px; }
+
+/* Diálogo de encerramento. */
+.dialogo { max-width: min(440px, calc(100vw - 32px)); padding: 24px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--ink); box-shadow: 0 24px 64px rgba(13, 17, 23, 0.3); }
+.dialogo::backdrop { background: rgba(13, 17, 23, 0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.dialogo p { color: var(--muted); }
+.dialogo .acoes { justify-content: flex-end; }
+.btn--perigo-cheio { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+/* Prévia da câmera no teste técnico. */
+.camera-teste { display: grid; grid-template-columns: minmax(160px, 240px) minmax(0, 1fr); gap: 16px; align-items: center; }
+.camera-teste__previa { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-md); overflow: hidden; background: #0d1117; display: grid; place-items: center; }
+.camera-teste__previa video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); opacity: 0; transition: opacity 300ms; }
+.camera-teste__previa[data-camera="ligada"] video { opacity: 1; }
+.camera-teste__vazio svg { width: 32px; height: 32px; fill: none; stroke: #a1a6ae; stroke-width: 1.6; stroke-linejoin: round; }
+.camera-teste p { margin: 4px 0 10px; }
+
+/* Tablet: painéis um pouco mais baixos; rótulos dos controles continuam. */
+@media (max-width: 1024px) {
+  .painel { aspect-ratio: 1 / 1; max-height: 44vh; }
+}
+
+/* Celular: a entrevistadora ocupa o palco; você aparece num quadro no canto
+   (como numa chamada), as falas ficam compactas e os controles fixos embaixo. */
+@media (max-width: 720px) {
+  body.em-conversa main { padding: 8px 12px calc(96px + env(safe-area-inset-bottom)); }
+  body.em-conversa header.topo { padding: 6px 12px; }
+  .sala { gap: 10px; }
+  .sala__barra { gap: 6px; }
+  .fase { font-size: 13px; padding: 4px 12px 4px 10px; min-height: 32px; }
+  .fase__texto { display: none; }
+  .sala__info { gap: 12px; font-size: 12px; }
+  #conexao-texto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .palco { grid-template-columns: 1fr; }
+  .painel--ia { aspect-ratio: auto; height: min(42dvh, 360px); max-height: none; }
+  .painel--voce { position: absolute; z-index: 1; right: 10px; top: 10px; width: 30%; max-width: 132px; aspect-ratio: 3 / 4; border-radius: 14px; }
+  .painel--voce .etiqueta { left: 6px; bottom: 6px; padding: 3px 8px; font-size: 11px; gap: 4px; }
+  .painel--voce .etiqueta strong { display: none; }
+  .painel--voce .camera-aviso { display: none; }
+  .sem-camera__inicial { width: 48px; font-size: 20px; }
+  .falas { grid-template-columns: 1fr; gap: 8px; }
+  .fala { min-height: 0; padding: 10px 14px; }
+  .legenda, .voce { max-height: 5em; }
+  .controles { position: fixed; z-index: 4; left: 0; right: 0; bottom: 0; max-width: none; justify-content: space-between; gap: 0; padding: 6px 6px max(6px, env(safe-area-inset-bottom)); border-radius: 18px 18px 0 0; border-width: 1px 0 0; }
+  .controles__grupo + .controles__grupo { padding-left: 0; margin-left: 0; border-left: 0; }
+  .ctl { min-width: 44px; min-height: 48px; padding: 4px; }
+  .ctl__rotulo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .ctl--encerrar { margin-left: 2px; min-width: 52px; }
+  .ajustes-pop__caixa { position: fixed; left: 12px; right: 12px; bottom: calc(72px + env(safe-area-inset-bottom)); transform: none; width: auto; }
+  .camera-teste { grid-template-columns: 1fr; }
+}
+/* Telas baixas (paisagem no celular): palco menor para caber a conversa. */
+@media (max-height: 560px) and (min-width: 721px) {
+  .painel { max-height: 46vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .legenda, .voce, .pausa { animation: none; }
+  .pensando i, [data-fase="pensando"] .fase__ponto, [data-fase="conectando"] .fase__ponto { animation: none; opacity: 1; }
+  .painel, #camera, #onda, .sem-camera { transition: none; }
+}
 .msg { border-radius: var(--radius-md); padding: 10px 14px; max-width: 92%; }
 .msg--ia { background: var(--surface); border: 1px solid var(--border); }
 .msg--candidato { background: var(--soft); justify-self: end; }
@@ -136,11 +299,6 @@ label.opcao input { width: 20px; height: 20px; margin-top: 3px; accent-color: va
 [hidden] { display: none !important; }
 footer.rodape { max-width: 760px; margin: 0 auto; padding: 0 16px 32px; font-size: 13px; color: var(--muted); }
 footer.rodape a { color: var(--primary-ink); }
-@media (max-width: 600px), (max-height: 700px) {
-  /* Em telas estreitas ou baixas a barra fixa cobriria a resposta e o botão de envio: fica no fluxo, abaixo da conversa. */
-  .controles { position: static; background: none; }
-  .controles .btn { flex: 1 1 45%; }
-}
 .ajustes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 8px; }
 .ajustes input[type="range"] { accent-color: var(--cta); min-height: 32px; padding: 0; border: 0; }
 .obrigado { background: var(--soft); }
