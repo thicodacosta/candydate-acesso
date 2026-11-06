@@ -303,3 +303,11 @@ footer.rodape a { color: var(--primary-ink); }
 .ajustes input[type="range"] { accent-color: var(--cta); min-height: 32px; padding: 0; border: 0; }
 .obrigado { background: var(--soft); }
 .obrigado h2 { margin: 0 0 6px; color: var(--primary-ink); }
+
+/* Gráficos do dossiê compartilhado. */
+:root { --g-atende: #12804f; --g-parcial: #0e7ab8; --g-validar: #b7791f; --g-nao-atende: #c4292e; --g-nao-investigado: #8a919b; }
+@media (prefers-color-scheme: dark) { :root { --g-atende: #3ccf8e; --g-parcial: #4db8f5; --g-validar: #e8b04a; --g-nao-atende: #ff7a7e; --g-nao-investigado: #8a919b; } }
+.graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px 32px; }
+.grafico { margin: 0; min-width: 0; }
+.grafico figcaption { margin-bottom: 10px; font-weight: 600; }
+.grafico svg { display: block; width: 100%; height: auto; }
