@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600;700&display=swap" />
-    <link rel="stylesheet" href="sala.css?v=mw9ak6cl" />
+    <link rel="stylesheet" href="sala.css?v=mw9lg1a4" />
   </head>
   <body>
     <a class="pular" href="#conteudo">Ir para o conteúdo</a>
@@ -80,17 +80,30 @@
       <section id="tela-teste" hidden>
         <h1>Teste rápido de áudio</h1>
         <p class="lead">Leva menos de um minuto e evita surpresas durante a conversa.</p>
-        <div class="card">
-          <div class="teste-linha"><div><strong>Microfone</strong><div class="nota">Fale algo e veja a barra se mover.</div></div><span id="mic-status" class="nota">aguardando permissão</span></div>
-          <div class="medidor" aria-hidden="true"><span id="mic-nivel"></span></div>
-          <div class="teste-linha"><div><strong>Reconhecimento de fala</strong><div class="nota" id="stt-dica">Diga: "Estou pronta para começar" ou "Estou pronto para começar".</div></div><span id="stt-status" class="nota">—</span></div>
-          <p class="voce" id="stt-eco" aria-live="polite"></p>
-          <div class="teste-linha"><div><strong>Som</strong><div class="nota">Ouça a voz da entrevistadora.</div></div><button class="btn" id="testar-som">Tocar voz de teste</button></div>
-          <div class="ajustes">
-            <label class="campo"><span>Volume</span><input type="range" id="volume-teste" min="0" max="100" step="5" /></label>
-            <label class="campo"><span>Velocidade da voz</span><select id="velocidade-teste"><option value="0.9">Mais devagar</option><option value="1">Normal</option><option value="1.1">Mais rápida</option></select></label>
-          </div>
-          <label class="opcao"><input type="checkbox" id="som-ok" /> <span>Consegui ouvir a voz de teste.</span></label>
+        <div class="card teste">
+          <section class="teste-bloco" aria-labelledby="t-mic">
+            <div class="teste-cabeca"><h2 id="t-mic">1. Microfone</h2><span class="estado" id="mic-estado" data-tom="neutro" role="status">Aguardando permissão</span></div>
+            <label class="campo campo--linha"><span>Microfone em uso</span><select id="mic-dispositivo" disabled><option>Aguardando permissão</option></select></label>
+            <div class="medidor" role="meter" aria-label="Nível do microfone" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="mic-medidor"><span id="mic-nivel"></span></div>
+            <p class="nota" id="mic-dica">Fale algo e veja a barra se mover.</p>
+          </section>
+          <section class="teste-bloco" aria-labelledby="t-stt">
+            <div class="teste-cabeca"><h2 id="t-stt">2. Reconhecimento da sua fala</h2><span class="estado" id="stt-estado" data-tom="neutro" role="status">Aguardando o microfone</span></div>
+            <p class="nota">Toque em <strong>Testar reconhecimento</strong> e diga: <strong>"Estou pronta para começar"</strong> (ou "pronto").</p>
+            <div class="acoes acoes--compacta"><button class="btn" id="testar-stt" type="button" disabled>Testar reconhecimento</button></div>
+            <p class="voce" id="stt-eco" aria-live="polite"></p>
+            <p class="nota" id="stt-dica"></p>
+          </section>
+          <section class="teste-bloco" aria-labelledby="t-voz">
+            <div class="teste-cabeca"><h2 id="t-voz">3. Voz da entrevistadora</h2><span class="estado" id="voz-estado" data-tom="neutro" role="status">Aguardando</span></div>
+            <div class="teste-linha"><span class="nota">Toque para ouvir a voz que vai conduzir a entrevista.</span><button class="btn" id="testar-som" type="button">Tocar voz de teste</button></div>
+            <div class="ajustes">
+              <label class="campo"><span>Volume</span><input type="range" id="volume-teste" min="0" max="100" step="5" /></label>
+              <label class="campo"><span>Velocidade da voz</span><select id="velocidade-teste"><option value="0.9">Mais devagar</option><option value="1">Normal</option><option value="1.1">Mais rápida</option></select></label>
+            </div>
+            <label class="opcao"><input type="checkbox" id="som-ok" disabled /> <span>Consegui ouvir a voz de teste.</span></label>
+            <p class="nota" id="voz-dica"></p>
+          </section>
         </div>
         <div class="card camera-teste">
           <div class="camera-teste__previa" data-camera="desligada" id="previa-camera">
@@ -105,6 +118,7 @@
           </div>
         </div>
         <p id="teste-alerta" class="alerta" hidden></p>
+        <p id="teste-pendente" class="nota" role="status"></p>
         <div class="acoes"><button class="btn btn--primario" id="comecar">Começar a entrevista</button><button class="btn" data-voltar>Voltar</button></div>
       </section>
 
@@ -152,6 +166,7 @@
             <p class="fala__vazia">Sua resposta aparece aqui enquanto você fala.</p>
           </div>
         </div>
+        <p class="reenviar" id="voz-falhou" hidden><span id="voz-falhou-texto">A voz da entrevistadora não carregou. A pergunta está escrita acima.</span> <button class="btn btn--primario" id="voz-tentar" type="button">Ouvir de novo</button></p>
         <p class="reenviar" id="reenviar" hidden><span>Não conseguimos enviar sua última resposta.</span> <button class="btn btn--primario" id="btn-tentar" type="button">Tentar de novo</button></p>
 
         <div class="controles" role="toolbar" aria-label="Controles da entrevista">
@@ -230,6 +245,6 @@
     <footer class="rodape">
       Candydate Interview · <a href="#" id="link-exclusao">Pedir a exclusão dos meus dados</a> · <a href="#" id="link-ajuda">Pedir ajuda</a>
     </footer>
-    <script type="module" src="sala.js?v=mw9ak6cl"></script>
+    <script type="module" src="sala.js?v=mw9lg1a4"></script>
   </body>
 </html>
