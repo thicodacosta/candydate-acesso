@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600;700&display=swap" />
-    <link rel="stylesheet" href="sala.css?v=mw5j0fza" />
+    <link rel="stylesheet" href="sala.css?v=mw9ak6cl" />
   </head>
   <body>
     <a class="pular" href="#conteudo">Ir para o conteúdo</a>
@@ -47,8 +47,8 @@
         <div class="card">
           <h2>Acessibilidade</h2>
           <ul class="lista">
-            <li>Legendas da fala da entrevistadora ficam sempre visíveis, e você pode responder digitando a qualquer momento.</li>
-            <li>Se preferir, faça a entrevista inteira por texto. A modalidade usada é registrada para a equipe considerar na comparação.</li>
+            <li>A entrevista é por voz, como numa chamada. Use um navegador atualizado e permita o acesso ao microfone. Fone de ouvido ajuda.</li>
+            <li>Legendas da fala da entrevistadora ficam sempre visíveis.</li>
             <li>Precisa de outra forma de participar (por exemplo, com uma pessoa)? Use "Pedir ajuda" e a equipe entra em contato.</li>
           </ul>
         </div>
@@ -61,11 +61,6 @@
           <p class="nota">Versão dos termos: <span id="termos-versao"></span></p>
         </div>
 
-        <div class="card">
-          <h2>Como prefere responder?</h2>
-          <label class="opcao"><input type="radio" name="modalidade" value="voz" checked /> <span><strong>Por voz</strong>, como numa chamada. Recomendado em fone de ouvido.</span></label>
-          <label class="opcao"><input type="radio" name="modalidade" value="texto" /> <span><strong>Por texto</strong>, digitando as respostas.</span></label>
-        </div>
         <div class="acoes">
           <button class="btn btn--primario" id="ir-teste" disabled>Continuar</button>
           <button class="btn" id="ir-agendar">Agendar para depois</button>
@@ -110,7 +105,7 @@
           </div>
         </div>
         <p id="teste-alerta" class="alerta" hidden></p>
-        <div class="acoes"><button class="btn btn--primario" id="comecar">Começar a entrevista</button><button class="btn" id="usar-texto">Fazer por texto</button><button class="btn" data-voltar>Voltar</button></div>
+        <div class="acoes"><button class="btn btn--primario" id="comecar">Começar a entrevista</button><button class="btn" data-voltar>Voltar</button></div>
       </section>
 
       <!-- 4. Conversa: entrevistadora (onda) | você (câmera), falas e controles -->
@@ -204,14 +199,6 @@
           </button>
         </div>
 
-        <details class="digitar" id="digitar">
-          <summary>Responder digitando</summary>
-          <form id="form-texto">
-            <label for="resposta" class="visually-hidden">Sua resposta</label>
-            <textarea id="resposta" rows="3" placeholder="Escreva sua resposta…"></textarea>
-            <button class="btn btn--primario" type="submit">Enviar resposta</button>
-          </form>
-        </details>
         <details class="historico-caixa"><summary>Ver a conversa completa</summary><div class="historico" id="historico" aria-live="off"></div></details>
 
       </section>
@@ -243,6 +230,6 @@
     <footer class="rodape">
       Candydate Interview · <a href="#" id="link-exclusao">Pedir a exclusão dos meus dados</a> · <a href="#" id="link-ajuda">Pedir ajuda</a>
     </footer>
-    <script type="module" src="sala.js?v=mw5j0fza"></script>
+    <script type="module" src="sala.js?v=mw9ak6cl"></script>
   </body>
 </html>
