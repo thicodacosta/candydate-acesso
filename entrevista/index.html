@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600;700&display=swap" />
-    <link rel="stylesheet" href="sala.css?v=mwm31ss3" />
+    <link rel="stylesheet" href="sala.css?v=mwm9lvri" />
   </head>
   <body>
     <a class="pular" href="#conteudo">Ir para o conteúdo</a>
@@ -168,6 +168,14 @@
         </div>
         <p class="reenviar" id="voz-falhou" hidden><span id="voz-falhou-texto">A voz da entrevistadora não carregou. A pergunta está escrita acima.</span> <button class="btn btn--primario" id="voz-tentar" type="button">Ouvir de novo</button></p>
         <p class="reenviar" id="reenviar" hidden><span>Não conseguimos enviar sua última resposta.</span> <button class="btn btn--primario" id="btn-tentar" type="button">Tentar de novo</button></p>
+        <div class="escrever" id="escrever" hidden>
+          <p class="escrever__texto">O áudio está com dificuldade para chegar. Se preferir, escreva só esta resposta; depois a conversa volta por voz.</p>
+          <form id="form-escrever" class="escrever__form">
+            <label class="sr-only" for="texto-escrito">Sua resposta</label>
+            <textarea id="texto-escrito" rows="3" maxlength="4000" placeholder="Escreva sua resposta"></textarea>
+            <button class="btn btn--primario" type="submit">Enviar resposta</button>
+          </form>
+        </div>
 
         <div class="controles" role="toolbar" aria-label="Controles da entrevista">
           <div class="controles__grupo">
@@ -245,6 +253,6 @@
     <footer class="rodape">
       Candydate Intelligence · <a href="#" id="link-exclusao">Pedir a exclusão dos meus dados</a> · <a href="#" id="link-ajuda">Pedir ajuda</a>
     </footer>
-    <script type="module" src="sala.js?v=mwm31ss3"></script>
+    <script type="module" src="sala.js?v=mwm9lvri"></script>
   </body>
 </html>

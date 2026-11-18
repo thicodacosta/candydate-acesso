@@ -376,3 +376,19 @@ footer.rodape a { color: var(--primary-ink); }
 .teste-bloco .nota { margin: 0; }
 .acoes--compacta { margin-top: 0; }
 #teste-pendente { margin: 12px 0 0; }
+
+/* Escrever a resposta (só depois de duas falhas seguidas de captura de voz) */
+.escrever { margin: 8px 0 0; padding: 12px; border: 1px solid var(--border, #e2e6eb); border-radius: 12px; background: var(--surface, #fff); }
+.escrever__texto { margin: 0 0 8px; font-size: 14px; color: var(--muted, #5f626a); }
+.escrever__form { display: flex; flex-direction: column; gap: 8px; }
+.escrever__form textarea { width: 100%; font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid var(--border, #e2e6eb); border-radius: 10px; resize: vertical; }
+.escrever__form .btn { align-self: flex-end; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* Confirmação visível de que a resposta chegou */
+[data-etapa="recebida"] .fase__ponto { background: var(--ok, #15a66b); animation: none; box-shadow: 0 0 0 4px rgba(21, 166, 107, 0.18); }
+[data-etapa="captando"] .fase__ponto { background: var(--ok, #15a66b); box-shadow: 0 0 0 4px rgba(21, 166, 107, 0.18); }
+/* Celular: controles com área de toque de pelo menos 44 px, alcançáveis com uma mão */
+@media (max-width: 640px) {
+  .controles .ctl { min-width: 48px; min-height: 48px; }
+  .escrever__form .btn { align-self: stretch; }
+}
