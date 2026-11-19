@@ -90,6 +90,7 @@
       }
       input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--ring); }
       .cupom { display: flex; gap: 8px; }
+      [data-preco] { display: none; }
       .cupom input { text-transform: uppercase; }
       button { font: 600 15px/20px Inter, sans-serif; cursor: pointer; border-radius: 999px; transition: background-color 120ms, transform 120ms; }
       .secundario { padding: 0 18px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink); }
@@ -97,7 +98,7 @@
       .principal { width: 100%; min-height: 50px; border: 0; background: var(--cta); color: #fff; margin-top: 6px; }
       .principal:hover { background: var(--cta-hover); transform: translateY(-1px); }
       .principal:disabled, .teste:disabled { opacity: 0.6; cursor: wait; transform: none; }
-      .botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .botoes { display: grid; grid-template-columns: 1fr; gap: 10px; }
       .teste { min-height: 50px; margin-top: 6px; border: 1px solid var(--primary); background: var(--soft); color: var(--primary-ink); }
       .teste:hover { background: var(--surface); }
       body.com-cupom .teste { display: none; }
@@ -118,9 +119,9 @@
   <body>
     <header><div class="marca"><img src="candydate-logo.png" alt="Candydate" /></div></header>
     <main id="conteudo">
-      <p class="eyebrow">Assinatura</p>
-      <h1>Escolha o seu plano</h1>
-      <p class="lead">Teste grátis por 3 dias (até 100 mil tokens de IA), sem cartão. Depois, assinatura mensal: cancele quando quiser.</p>
+      <p class="eyebrow">Acesso</p>
+      <h1>Ative o seu acesso</h1>
+      <p class="lead">O acesso aos produtos Candydate é liberado pela nossa equipe. Use o link com cupom que você recebeu: os dados abaixo criam a sua conta e o acesso é liberado na hora.</p>
 
       <form id="form" novalidate>
         <fieldset class="planos" style="border: 0; padding: 0; margin: 0 0 24px">
@@ -143,6 +144,14 @@
               <p>Entrevistas, currículos, comparativo, pesquisa salarial, Shortlist no LinkedIn e Chat.</p>
             </span>
           </label>
+          <label class="plano">
+            <input type="radio" name="plano" value="interview" />
+            <span class="cartao">
+              <strong>Intelligence</strong>
+              <span class="gratis">Grátis com o cupom</span>
+              <p>Entrevistas por voz com a Candy, roteiros, dossiês com evidências e a nota explicável.</p>
+            </span>
+          </label>
         </fieldset>
 
         <div class="grade">
@@ -152,7 +161,7 @@
           <div class="campo"><label for="telefone">Telefone (com DDD)</label><input type="text" id="telefone" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="(11) 98765-4321" required /></div>
         </div>
         <div class="campo">
-          <label for="cupom">Cupom <span style="font-weight: 400; color: var(--muted)">(opcional)</span></label>
+          <label for="cupom">Cupom de acesso</label>
           <div class="cupom">
             <input type="text" id="cupom" autocomplete="off" maxlength="40" />
             <button type="button" id="aplicar" class="secundario">Aplicar</button>
@@ -161,10 +170,10 @@
         </div>
         <p id="erro" class="msg erro" role="alert"></p>
         <div class="botoes">
-          <button type="submit" id="enviar" class="principal" value="assinar">Assinar agora</button>
-          <button type="submit" id="testar" class="teste" value="teste">Testar grátis por 3 dias</button>
+          <button type="submit" id="enviar" class="principal" value="assinar">Liberar meu acesso</button>
+          <button type="submit" id="testar" class="teste" value="teste" hidden>Testar grátis por 3 dias</button>
         </div>
-        <p class="nota" id="nota">Assinatura: pagamento no ambiente seguro do Asaas (cartão de crédito), com os seus dados já preenchidos; o acesso é liberado assim que o pagamento é confirmado. Teste grátis: uma vez por pessoa (e-mail e CPF) em cada plano.</p>
+        <p class="nota" id="nota">Ainda não tem o cupom? Fale com a pessoa da Candydate que está em contato com você.</p>
       </form>
     </main>
     <script>
@@ -177,12 +186,12 @@
       const plano = () => document.querySelector('input[name="plano"]:checked').value;
       // Vindo de uma extensão (?plano=…): só o plano daquele produto, sem trocar.
       const planoFixo = params.get("plano");
-      if (["bp", "recruiter"].includes(planoFixo)) {
+      if (["bp", "recruiter", "interview"].includes(planoFixo)) {
         const escolhido = document.querySelector(`input[value="${planoFixo}"]`);
         escolhido.checked = true;
         document.querySelectorAll('input[name="plano"]').forEach((r) => r !== escolhido && r.closest(".plano").remove());
         document.querySelector(".planos").classList.add("planos--um");
-        document.querySelector("h1").textContent = `Plano ${planoFixo === "bp" ? "Business Partner" : "Recruiter"}`;
+        document.querySelector("h1").textContent = `Acesso ao ${{ bp: "Business Partner", recruiter: "Recruiter", interview: "Intelligence" }[planoFixo]}`;
       }
 
       const digitos = (v) => v.replace(/\D/g, "");
@@ -225,10 +234,10 @@
         document.querySelectorAll("[data-preco]").forEach((p) => p.classList.toggle("riscado", Boolean(ok)));
         $("cupom-msg").className = `msg ${ok ? "ok" : texto ? "erro" : ""}`;
         $("cupom-msg").textContent = texto ?? "";
-        $("enviar").textContent = ok ? "Liberar meu acesso" : "Assinar agora";
+        $("enviar").textContent = "Liberar meu acesso";
         $("nota").textContent = ok
           ? "Com o cupom, o acesso é liberado na hora, sem cobrança e sem cartão. Quem ainda não tem conta recebe por e-mail um código para criar a senha."
-          : "Assinatura: pagamento no ambiente seguro do Asaas (cartão de crédito), com os seus dados já preenchidos; o acesso é liberado assim que o pagamento é confirmado. Teste grátis: uma vez por pessoa (e-mail e CPF) em cada plano.";
+          : "Ainda não tem o cupom? Fale com a pessoa da Candydate que está em contato com você.";
       }
 
       async function aplicar() {
@@ -267,7 +276,10 @@
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return ($("erro").textContent = "Informe um e-mail válido.");
         if (!cpfOk($("cpf").value)) return ($("erro").textContent = "Informe um CPF válido.");
         if (![10, 11].includes(digitos($("telefone").value).length)) return ($("erro").textContent = "Informe um telefone com DDD.");
-        if (acao === "assinar" && $("cupom").value.trim() && !cupomValido) return ($("erro").textContent = "Clique em Aplicar para validar o cupom (ou apague o campo).");
+        // Sem contratação pelo site nem teste grátis: só o cupom do link libera o acesso.
+        if (acao === "teste") return ($("erro").textContent = "O teste grátis não está disponível.");
+        if (!$("cupom").value.trim()) return ($("erro").textContent = "Informe o cupom do link que você recebeu.");
+        if (!cupomValido) return ($("erro").textContent = "Clique em Aplicar para validar o cupom.");
         const botao = acao === "teste" ? $("testar") : $("enviar");
         const textoBotao = botao.textContent;
         $("enviar").disabled = $("testar").disabled = true;
